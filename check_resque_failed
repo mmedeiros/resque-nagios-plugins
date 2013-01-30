@@ -13,6 +13,9 @@ parser   = OptionParser.new do |opts|
   opts.on("-h", "--host redishost", "The hostname of the redis server") do |h|
     options[:host] = h
   end
+  opts.on("-n", "--namespace resque:namespace", "The resque namespace") do |n|
+    options[:namespace] = n
+  end
   opts.on("-w", "--warning percentage", "Warning threshold") do |w|
     options[:warning] = w
   end
@@ -27,6 +30,7 @@ if !required.all? { |k| options.has_key?(k) }
 else
   redis = Redis.new(:host => options[:host])
   Resque.redis = redis
+  Resque.redis.namespace = options[:namespace]
   count = Resque::Failure::Redis.count
 
   status = :ok
