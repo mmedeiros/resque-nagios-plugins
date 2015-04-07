@@ -1,34 +1,34 @@
 #!/usr/bin/env ruby
 
-require "rubygems"
-require "resque"
-require "resque/failure/redis"
-require "optparse"
+require 'rubygems'
+require 'resque'
+require 'resque/failure/redis'
+require 'optparse'
 
 options  = {}
 required = [:warning, :critical, :host]
 
 parser   = OptionParser.new do |opts|
-  opts.banner = "Usage: check_resque_failed [options]"
-  opts.on("-h", "--host redishost", "The hostname of the redis server") do |h|
+  opts.banner = 'Usage: check_resque_failed [options]'
+  opts.on('-h', '--host redishost', 'The hostname of the redis server') do |h|
     options[:host] = h
   end
-  opts.on("-n", "--namespace resque:namespace", "The resque namespace") do |n|
+  opts.on('-n', '--namespace resque:namespace', 'The resque namespace') do |n|
     options[:namespace] = n
   end
-  opts.on("-w", "--warning percentage", "Warning threshold") do |w|
+  opts.on('-w', '--warning percentage', 'Warning threshold') do |w|
     options[:warning] = w
   end
-  opts.on("-c", "--critical critical", "Critical threshold") do |c|
+  opts.on('-c', '--critical critical', 'Critical threshold') do |c|
     options[:critical] = c
   end
 end
 parser.parse!
 
-if !required.all? { |k| options.has_key?(k) }
+if !required.all? { |k| options.key?(k) }
   abort parser.to_s
 else
-  redis = Redis.new(:host => options[:host])
+  redis = Redis.new(host: options[:host])
   Resque.redis = redis
   Resque.redis.namespace = options[:namespace]
   count = Resque::Failure::Redis.count
@@ -41,7 +41,7 @@ else
   end
 
   print status.to_s.upcase
-  print " - "
+  print ' - '
   puts "failed: #{count}"
 
   if (status == :critical)
